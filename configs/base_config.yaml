@@ -1,0 +1,59 @@
+# Base Configuration for VLM Project
+
+# Project Settings
+project_name: "vlm-from-scratch"
+experiment_name: "coco-captioning-v1"
+seed: 42
+
+# Paths
+data:
+  root_dir: "./data"
+  coco_dir: "./data/coco"
+  annotations: "./data/coco/annotations"
+  images_dir: "./data/coco/images"
+  cache_dir: "./data/cache"
+
+output:
+  checkpoint_dir: "./checkpoints"
+  log_dir: "./logs"
+  results_dir: "./results"
+
+# Model Architecture
+model:
+  # Vision Encoder
+  vision_encoder:
+    name: "openai/clip-vit-base-patch16"
+    freeze: true
+    image_size: 224
+    hidden_size: 768
+  
+  # Projection Layer (trainable)
+  projection:
+    input_dim: 768
+    hidden_dim: 2048
+    output_dim: 768
+    num_layers: 2
+    dropout: 0.1
+  
+  # Language Model
+  language_model:
+    name: "gpt2"
+    freeze_layers: 0
+    max_length: 128
+    hidden_size: 768
+
+# Hardware & Distributed Training
+hardware:
+  device: "cuda"
+  num_gpus: 4
+  mixed_precision: "fp16"
+  gradient_checkpointing: true
+
+# Logging
+logging:
+  use_wandb: true
+  wandb_project: "vlm-from-scratch"
+  wandb_entity: null
+  log_interval: 10
+  save_interval: 500
+  eval_interval: 1000

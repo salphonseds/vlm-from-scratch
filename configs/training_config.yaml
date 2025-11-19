@@ -1,0 +1,68 @@
+# Training Configuration
+
+# Training Parameters
+training:
+  num_epochs: 10
+  batch_size: 32
+  gradient_accumulation_steps: 2
+  max_steps: -1
+  
+  # Learning Rate
+  learning_rate: 1e-4
+  warmup_steps: 1000
+  lr_scheduler: "cosine"
+  
+  # Optimization
+  optimizer: "adamw"
+  weight_decay: 0.01
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1e-8
+  max_grad_norm: 1.0
+  
+  # Regularization
+  dropout: 0.1
+  label_smoothing: 0.0
+
+# Data Loading
+dataloader:
+  num_workers: 8
+  pin_memory: true
+  prefetch_factor: 2
+  persistent_workers: true
+
+# Validation
+validation:
+  val_batch_size: 64
+  val_check_interval: 1.0
+  limit_val_batches: 100
+
+# Checkpointing
+checkpoint:
+  save_top_k: 3
+  monitor: "val_loss"
+  mode: "min"
+  save_last: true
+  save_on_train_end: true
+
+# Early Stopping
+early_stopping:
+  enabled: false
+  patience: 3
+  monitor: "val_loss"
+  mode: "min"
+  min_delta: 0.001
+
+# Phase 1: Image Captioning (COCO)
+phase1:
+  dataset: "coco"
+  task: "captioning"
+  train_split: "train2017"
+  val_split: "val2017"
+  max_caption_length: 40
+
+# Phase 2: Instruction Following (Future)
+phase2:
+  dataset: "llava"
+  task: "instruction"
+  enabled: false
