@@ -191,6 +191,10 @@ class Trainer:
         pbar = tqdm(self.train_loader, desc=f"Epoch {epoch}", disable=not self.is_main)
         
         for batch in pbar:
+            # Skip None batches (from corrupt images)
+            if batch is None:
+                continue
+                
             pixel_values = batch['pixel_values'].to(self.device)
             input_ids = batch['input_ids'].to(self.device)
             attention_mask = batch['attention_mask'].to(self.device)
@@ -242,6 +246,9 @@ class Trainer:
                     'lr': self.scheduler.get_last_lr()[0]
                 })
         
+        # Handle case where all batches were None
+        if num_batches == 0:
+            return 0.0
         return total_loss / num_batches
     
     @torch.no_grad()
@@ -254,6 +261,10 @@ class Trainer:
         pbar = tqdm(self.val_loader, desc="Validation", disable=not self.is_main)
         
         for batch in pbar:
+            # Skip None batches (from corrupt images)
+            if batch is None:
+                continue
+                
             pixel_values = batch['pixel_values'].to(self.device)
             input_ids = batch['input_ids'].to(self.device)
             attention_mask = batch['attention_mask'].to(self.device)
@@ -273,6 +284,9 @@ class Trainer:
             if self.is_main:
                 pbar.set_postfix({'val_loss': loss.item()})
         
+        # Handle case where all batches were None
+        if num_batches == 0:
+            return 0.0
         return total_loss / num_batches
     
     def save_checkpoint(self, filename):

@@ -69,12 +69,16 @@ class COCOCaptionDataset(Dataset):
         Returns:
             Dict with 'pixel_values', 'input_ids', 'attention_mask', 'labels'
         """
-        image_id = self.image_ids[idx]
-        
-        # Load image
-        image_info = self.coco.loadImgs(image_id)[0]
-        image_path = self.images_dir / image_info['file_name']
-        image = Image.open(image_path).convert('RGB')
+        try:
+            image_id = self.image_ids[idx]
+            
+            # Load image
+            image_info = self.coco.loadImgs(image_id)[0]
+            image_path = self.images_dir / image_info['file_name']
+            image = Image.open(image_path).convert('RGB')
+        except Exception as e:
+            # Return a different sample if this one fails
+            return self.__getitem__((idx + 1) % len(self))
         
         # Get captions
         ann_ids = self.coco.getAnnIds(imgIds=image_id)
@@ -128,6 +132,11 @@ class COCOCaptionDataset(Dataset):
 
 def collate_fn(batch: List[Dict]) -> Dict[str, torch.Tensor]:
     """Custom collate function for batching"""
+    # Filter out None items and items without required keys
+    batch = [item for item in batch if item is not None and 'input_ids' in item]
+    if len(batch) == 0:
+        return None
+    
     pixel_values = torch.stack([item['pixel_values'] for item in batch])
     input_ids = torch.stack([item['input_ids'] for item in batch])
     attention_mask = torch.stack([item['attention_mask'] for item in batch])

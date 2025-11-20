@@ -8,7 +8,7 @@ training:
   max_steps: -1
   
   # Learning Rate
-  learning_rate: 1e-4
+  learning_rate: 0.0001
   warmup_steps: 1000
   lr_scheduler: "cosine"
   
@@ -17,7 +17,7 @@ training:
   weight_decay: 0.01
   adam_beta1: 0.9
   adam_beta2: 0.999
-  adam_epsilon: 1e-8
+  adam_epsilon: 0.00000001
   max_grad_norm: 1.0
   
   # Regularization
